@@ -1,0 +1,34 @@
+
+1) You need the following packages for installing this sw:
+
+- libtool
+- freeglut3-dev
+- libglew-dev
+
+the following command would do in on an Ubuntu system:
+
+% sudo apt-get install libtool freeglut3-dev libglew-dev
+
+2) clean the project
+
+% make distclean
+% make clean
+
+3) build and execute
+
+% make
+% ./browser
+
+4) Sometimes you have to uncomment this line in Browser/browser.c (around line
+   446):
+
+  // Uncomment following line if you have problems initiating GLEW
+  //
+-  // glewExperimental = GL_TRUE;
++  glewExperimental = GL_TRUE;
+
+5) Sometimes you have to remove GL library from Makefile:
+
+-LIBS = -lm -lglut -lGLU -lGL -ljpeg -lGLEW
++LIBS = -lm -lglut -lGLU -ljpeg -lGLEW
+
