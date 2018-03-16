@@ -121,7 +121,15 @@ void OrthographicCamera::updateProjection() {
 // * Also, update projection matrix (projTrfm)
 
 void PerspectiveCamera::updateProjection() {
-
+	//aspectRatio = widthWindow/heightWindow
+	//widthWindow = right-left; hightWindow = top-bottom
+	//top = near*tan(fovy/2); bottom = -top;
+	//right = aspectRatio * top; left = -right;
+	m_top = m_near*tan(m_fovy/2);
+	m_bottom = -m_top;
+	m_right = m_aspectRatio * m_top;
+	m_left = -m_right;
+	m_projTrfm->setFrustum(m_left, m_right, m_bottom, m_top, m_near, m_far);
 	// Leave next line as-is
 	updateFrustumPlanes();
 }
@@ -143,7 +151,14 @@ void Camera::setViewTrfm() {
  */
 
 void Camera::updateFrame () {
-
+	//E = position, At = looking at, Up = upwards vector
+	Vector3 F(m_E - m_At);
+	F/=sqrt(F.dot(F));		//F = (E-A)/||E-A||
+	Vector3 aux(m_Up);
+	aux/=sqrt(aux.dot(aux));
+	m_R = aux; m_R = m_R * F;	m_R.normalize();//R = (up/||up||)*F
+	m_U = F; m_U = m_U*m_R;	m_U.normalize();
+	m_D = F; m_D.normalize();
 	// leave next line as-is
 	setViewTrfm();
 }
@@ -199,6 +214,8 @@ void Camera::projectionTrfmGL(float *gmatrix) const  { m_projTrfm->getGLMatrix(g
 ////////////////////////////////////////////////
 // Movement
 
+//TRASLADAR LOS VECTORES DE POSICIÓN (E) Y DE LOOK_AT (E)
+
 // @@ TODO:
 // Move the camera "step" units ahead. Fly mode.
 //
@@ -206,7 +223,10 @@ void Camera::projectionTrfmGL(float *gmatrix) const  { m_projTrfm->getGLMatrix(g
 // step               -> number of units to fly (can be negative)
 
 void Camera::fly(float step) {
-
+	//tip: walking moves in a 3D plane
+	//for example's sake we'll do this first iteration with DOLLY movement (eje D: avanzar/retroceder)
+	m_E += step * m_D;
+	m_At += step * m_D;
 	setViewTrfm();
 }
 
@@ -217,7 +237,13 @@ void Camera::fly(float step) {
 // step               -> number of units to walk (can be negative)
 
 void Camera::walk(float step) {
-
+	//tip: walking moves in a 2D plane 
+	//for example's sake we'll do this first iteration with DOLLY movement (eje D: avanzar/retroceder)
+	//HOWEVER, for this one only coordinates 0&2 will be modified	(x & z, y is height which is unique to flying)
+	m_E[0]+= step * m_D[0];	
+	m_E[2]+= step * m_D[2];
+	m_At[0]+= step * m_D[0];	
+	m_At[2]+= step * m_D[2];
 	setViewTrfm();
 }
 
