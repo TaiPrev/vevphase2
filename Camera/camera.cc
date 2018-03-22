@@ -152,12 +152,12 @@ void Camera::setViewTrfm() {
 
 void Camera::updateFrame () {
 	//E = position, At = looking at, Up = upwards vector
-	Vector3 F(m_E - m_At);
-	F/=sqrt(F.dot(F));		//F = (E-A)/||E-A||
-	Vector3 aux(m_Up);
-	aux/=sqrt(aux.dot(aux));
-	m_R = aux; m_R = m_R * F;	m_R.normalize();//R = (up/||up||)*F
-	m_U = F; m_U = m_U*m_R;	m_U.normalize();
+	Vector3 F = m_E - m_At;
+	F.normalize(); 	//F = (E-A)/||E-A||
+	Vector3 aux = m_Up;
+	aux.normalize();
+	m_R = aux; m_R.cross(F);	m_R.normalize();	//R = (up/||up||)*F
+	m_U = F; m_U.cross(m_R);	m_U.normalize();
 	m_D = F; m_D.normalize();
 	// leave next line as-is
 	setViewTrfm();
