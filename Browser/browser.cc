@@ -19,6 +19,7 @@ static bool runAnimation = false;
 // Global variables for measuring time (in milli-seconds)
 static int startTime;
 static int prevTime;
+static float t;
 
 static void switchAllLights(bool onOff) {
 	for(LightManager::iterator it = LightManager::instance()->begin(), end = LightManager::instance()->end();
@@ -458,6 +459,8 @@ void idle(void) {
 }
 
 void animate(int value) {
+	RenderState *rs = RenderState::instance();
+	//int direction = 1;
 	// Set up the next timer tick (do this first)
 	glutTimerFunc(MG_TIMERMSECS, animate, 0);
 
@@ -469,6 +472,16 @@ void animate(int value) {
 	// ##### REPLACE WITH YOUR OWN GAME/APP MAIN CODE HERE #####
 	if (runAnimation) {
 		// Force a redisplay to render the new image
+			t = t + 0.01f;
+			if(t>1.0f){t=0.0f;}
+		/*
+		else{
+			t -= 0.01f;
+			if(t<=0.0f){direction = 1; printf("%d\n", direction);}
+		}*/
+		printf("time %5.2f\n", t);
+
+		rs->setTime(t);
 
 		glutPostRedisplay();
 	}
