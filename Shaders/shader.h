@@ -77,4 +77,5 @@ private:
 	GLint m_ubumpSampler;
 	GLint m_utexCubemap;
 
+	GLint m_utime;
 };
