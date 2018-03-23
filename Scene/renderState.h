@@ -187,6 +187,9 @@ public:
 	 */
 	bool getBBoxDraw() const;
 
+	void setTime(const float t);
+	const float getTime() const;
+
 	void print() const;
 
 private:
@@ -221,4 +224,8 @@ private:
 
 	ShaderProgram *m_activeShader;
 	bool m_drawBBox;
+
+	float m_time;
+	//operaciones para extraer la variable compartida de tiempo, sacadas de ambientlight
+	
 };

@@ -162,6 +162,17 @@ const Vector3 &RenderState::getSceneAmbient() const {
 	return m_ambient;
 }
 
+
+////////////////////////////////////////////
+// TIME
+void RenderState::setTime(const float t){
+	m_time = t;
+}
+
+const float RenderState::getTime() const {
+	return m_time;
+}
+
 void RenderState::print() const {
 	printf("* Stacks\n");
 	printf("texture:\n");
