@@ -33,7 +33,7 @@ varying vec4 f_color;
 varying vec2 f_texCoord;
 
 float lambert(vec3 n, const vec3 l) {
-	return 1.0;
+	return max(0.0, dot(n,l));
 }
 
 float specular_channel(const vec3 n,
@@ -48,6 +48,8 @@ void direction_light(const in int i,
 					 const in vec3 viewDirection,
 					 const in vec3 normal,
 					 inout vec3 diffuse, inout vec3 specular) {
+		//para la luz i-ésima se acumula el coseno que se forma en lamber por el color de la luz por el color del material
+		diffuse = diffuse + lambert(normal, lightDirection) * theLights[i].diffuse * theMaterial.diffuse;
 }
 
 void point_light(const in int i,
@@ -68,20 +70,31 @@ void spot_light(const in int i,
 }
 
 void main() {
+	//acumuladores
+	vec3 diffuse = vec3(0.0);
+	vec3 specular = vec3(0.0);
+	//normal del vértice en el espacio de la cámara
+	vec4 N4 = modelToCameraMatrix * vec4(v_normal, 0.0);
+	//hacer lo mismo
+	vec4 V4 = modelToCameraMatrix * vec4(v_position, 0.0);
 
-	// for(int i=0; i < active_lights_n; ++i) {
-	//	if(theLights[i].position.w == 0.0) {
-	//	  // direction light
-	//	} else {
+	 for(int i=0; i < active_lights_n; ++i) {
+		if(theLights[i].position.w == 0.0) {
+		  // direction light
+		  //V = direccción de la vista, N = normal
+		  vec3 L = normalize(-theLights[i].position.xyz);
+		  direction_light(i, L, normalize(V4.xyz), normalize(N4.xyz), diffuse, specular);
+		} 
+	//	  else {
 	//	  if (theLights[i].cosCutOff == 0.0) {
 	//		// point light
 	//	  } else {
 	//		// spot light
 	//	  }
 	//	}
-	// }
+	 }
 
-	f_color = vec4(1.0);
+	f_color = vec4(diffuse, 1.0);
 	gl_Position = modelToClipMatrix * vec4(v_position, 1.0);
 	f_texCoord = v_texCoord;
 }
