@@ -83,6 +83,25 @@ void Light::placeScene() {
 
 	if( ! m_switched ) return;
 
+	RenderState *rs = RenderState::instance();
+	Trfm3D *aux = rs->top(RenderState::modelview);	//para obtener la matriz arriba de la pila
+	
+	//m_positionEye: para todas, si es direccional vector (normalizar), si es posicional o spot punto
+	//m_spotDirectionEye: solo si es Spot y con m_spotDirection
+
+	if(m_type == directional){
+		m_positionEye = aux->transformVector(m_position);
+		m_positionEye.normalize();
+	}
+	else if (m_type == positional){
+		m_positionEye = aux->transformPoint(m_position);
+	}
+	else if (m_type == spotlight) {
+		m_positionEye = aux->transformPoint(m_position);
+		m_spotDirectionEye = aux->transformVector(m_spotDirection);
+		m_spotDirectionEye.normalize();
+	}
+
 }
 
 void Light::setSpotData(const Vector3 & direction,
