@@ -12,7 +12,7 @@ varying vec4 f_color;
 
 void main() {
 	
-	if(time<1){f_color = vec4(time,time,time,1);}
+	if(time<1){f_color = vec4(time,(1-time),(1-time),1);}
 	else{f_color = vec4(0,0,0,1);}
 	gl_Position = modelToClipMatrix * vec4(v_position, 1);
 }

@@ -485,14 +485,18 @@ void Node::frustumCull(Camera *cam) {
 //    method.
 
 const Node *Node::checkCollision(const BSphere *bsph) const {
-	for(list<Node *>::const_iterator it = m_children.begin(), end = m_children.end();
-        it != end; ++it) {
-        const Node *theChild = *it;
-        if(BSphereBBoxIntersect(bsph,theChild->m_containerWC)){	//si hay colisión
-        	if(theChild->m_gObject!=0){return theChild;}	//si es hijo Objeto devuelve este
-        	else{theChild->checkCollision(bsph);}	//si no lo es busca en los hijos de este
-        }
-    }
+	//check for the father, the current one, before entering the for
+	if (BSphereBBoxIntersect(bsph,m_containerWC) && not m_gObject!=0){
+
+		for(list<Node *>::const_iterator it = m_children.begin(), end = m_children.end();
+        	it != end; ++it) {
+        	const Node *theChild = *it;
+        	if(BSphereBBoxIntersect(bsph,theChild->m_containerWC)){	//si hay colisión
+        		if(theChild->m_gObject!=0){printf("found \n"); return theChild;}	//si es hijo Objeto devuelve este
+        		else{printf("deeper \n"); theChild->checkCollision(bsph);}	//si no lo es busca en los hijos de este
+        	}
+   	 	}
+	}
 	//if (m_checkCollision) return 0;
 	return 0; /* No collision */
 }
