@@ -22,13 +22,14 @@ uniform struct material_t {
 
 uniform sampler2D texture0;
 
+//they all DON'T COME NORMALIZED, BUT SHAN'T BE SO IN THEESE VARIABLES
 varying vec3 f_position;      // camera space
 varying vec3 f_viewDirection; // camera space
 varying vec3 f_normal;        // camera space
 varying vec2 f_texCoord;
 
 float lambert(const vec3 n, const vec3 l) {
-	return 1.0;
+	return max(0.0, dot(n,l));
 }
 
 float specular_channel(const vec3 n,
@@ -37,6 +38,8 @@ float specular_channel(const vec3 n,
 					   float m) {
 	return 1.0;
 }
+
+//calcular la aportación en el PIXEL
 
 void direction_light(const in int i,
 					 const in vec3 lightDirection,
@@ -50,7 +53,7 @@ void point_light(const in int i,
 				 const in vec3 position,
 				 const in vec3 viewDirection,
 				 const in vec3 normal,
-				 inout vec3 diffuse, inout vec3 specular) {
+				 inout vec3 diffuse, inout vec3 specular) {	
 }
 
 // Note: no attenuation in spotlights
