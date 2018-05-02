@@ -5,6 +5,7 @@ vec3 N = normalize(mapaBump.rgb * 2.0 - 1.0);
 ////////////////////////////////////////////////////////////////
 
 http://fabiensanglard.net/bumpMapping/index.php
+https://www.opengl.org/discussion_boards/showthread.php/181740-Bump-mapping-in-fragment-shader
 
 ////////////////////////////////////////////////////////////////
 
