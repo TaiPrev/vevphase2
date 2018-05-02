@@ -132,7 +132,7 @@
     "node" : {
         "name" : "root",
         "trfm" : [ { "trans" : [0, -10, -100] } ],
-        "shader" : "pervertex",
+        "shader" : "perfragment",
         "children" : [
             {
                 "name" : "smooth",
