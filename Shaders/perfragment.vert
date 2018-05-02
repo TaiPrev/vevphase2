@@ -23,4 +23,9 @@ void main() {
 	vec4 P4 = modelToCameraMatrix * vec4(v_position, 1.0);	//positionEye
 	vec4 N4 = modelToCameraMatrix * vec4(v_normal, 0.0);	//normal
 	vec4 V4 = (0.0, 0.0, 0.0, 1.0) - P4;					//V
+
+	f_position = P4.xyz;
+	f_normal = N4.xyz;
+	f_viewDirection =  V4.xyz;
+	f_texCoord = v_texCoord;
 }
