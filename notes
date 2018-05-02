@@ -1,0 +1,12 @@
+// textura bump-mapping
+vec4 mapaBump   = texture2D(bumpmap, f_texCoord);
+vec3 N = normalize(mapaBump.rgb * 2.0 - 1.0);
+
+////////////////////////////////////////////////////////////////
+
+http://fabiensanglard.net/bumpMapping/index.php
+
+////////////////////////////////////////////////////////////////
+
+http://image.diku.dk/projects/media/morten.mikkelsen.08.pdf
+https://www.microsoft.com/en-us/research/wp-content/uploads/1978/01/p286-blinn.pdf
