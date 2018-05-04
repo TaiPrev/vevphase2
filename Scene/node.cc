@@ -466,12 +466,14 @@ void Node::setCulled(bool culled) {
 
 void Node::updateCull(Camera * cam,
 					  unsigned int *planesBitmask) {
+
 }
 
 // @@ TODO: Frustum culling. See if a subtree is culled by the camera, and
 //          update m_isCulled accordingly.
 
 void Node::frustumCull(Camera *cam) {
+	
 }
 
 // @@ TODO: Check whether a BSphere (in world coordinates) intersects with a
