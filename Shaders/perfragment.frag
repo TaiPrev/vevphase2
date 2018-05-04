@@ -110,7 +110,7 @@ void main() {
 	vec3 diffuse = vec3(0.0);
 	vec3 specular = vec3(0.0);
 	//NORMALIZACIONES DE LOS VARYING
-	vec3 P = normalize(f_position);
+	vec3 P = f_position;
 	vec3 V = normalize(f_viewDirection);
 	vec3 N = normalize(f_normal);
 
