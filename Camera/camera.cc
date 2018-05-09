@@ -318,15 +318,38 @@ void  Camera::arcLeftRight(float angle) {
 
 int Camera::checkFrustum(const BBox *theBBox,
 						 unsigned int *planesBitM) {
-	//WE SUPPOSE PLANE Z ASSOCIATED WITH DEPTH AND PLANE X ASSOCIATED WITH WIDTH
-	//THIS IS A BASIC INTERJECT ALGORITHM, NOT THE FINAL VERSION
-	if (BBox->m_min[0] > m_left || m_right > BBox->m_max[0] ){ return -1;}
+	/*
+	int sum = 0;
+	//IF it does interject we CHECK if the BBOX parameters are INSIDE the camera's
+	//if so, it must be on BOTH sides, if it doesn't happen so the BBOX ISN'T fully contained in the camera's
+	if (BBox->m_min[0] > m_right || m_left > BBox->m_max[0] ){ return -1;}
+	else if (BBox->m_min[0] > m_left && BBox->m_max[0] < m_right){ sum +=1 ;}
+
 	if (BBox->m_min[1] > m_top || m_bottom > BBox->m_max[1] ){ return -1;}
-	if (BBox->m_min[1] > m_top || m_bottom > BBox->m_max[1] ){ return -1;}
-	//llegados aquí, SABEMOS que intersecta, pero no so está contenido dentro por completo o no
-	//tenemos que comprobar que los parámetros del BBox están DENTRO del cubo de frustum
-	
-	return 0; // BBox is fully inside the frustum LATER TO BE ELIMINATED
+	else if (BBox->m_min[1] > m_bottom && BBox->m_max[1] < m_top){ sum +=1 ;}
+
+	if (BBox->m_min[2] > m_far || m_near > BBox->m_far[2] ){ return -1;}
+	else if (BBox->m_min[2] > m_near && BBox->m_max[2] < m_far){ sum +=1 ;}
+
+	if (sum == 3){return 1;}
+	*/
+
+	//USAR BBOXPLANEINTERSECT
+
+	Plane *p;
+	int cuts[3] = {0, 0, 0};
+
+	for (int i = 0; i<=5; i++){
+		p = m_fPlanes[i];
+		int x = BBoxPlaneIntersect (theBBox, p);	// 0 = cutting with ; -1 = INSIDE ; 1 = OUTSIDE
+		if (x == 1){cuts[2] += 1;}
+		else if (x == 0){cuts[1] += 1;}
+		else if (x == -1){cuts[0] += 1;}
+	}
+
+	if (cuts[2] == 6){return -1};	//todos los planos estan fuera
+	else if (cuts[0] == 6){return 1};	//todos los planos estan dentro
+	return 0; // BBox CUTS the camera's, but isn't fully inside
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
