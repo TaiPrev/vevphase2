@@ -341,14 +341,15 @@ int Camera::checkFrustum(const BBox *theBBox,
 
 	for (int i = 0; i<=5; i++){
 		p = m_fPlanes[i];
-		int x = BBoxPlaneIntersect (theBBox, p);	// 0 = cutting with ; -1 = INSIDE ; 1 = OUTSIDE
-		if (x == 1){cuts[2] += 1;}
+		int x = BBoxPlaneIntersect (theBBox, p);	// 0 = box is cutting with p ; -1 = box is INSIDE p ; 1 = box is OUTSIDE p
+		if (x == 1){ cuts[2] += 1;}
 		else if (x == 0){cuts[1] += 1;}
 		else if (x == -1){cuts[0] += 1;}
 	}
-
-	if (cuts[2] == 6){return -1};	//todos los planos estan fuera
-	else if (cuts[0] == 6){return 1};	//todos los planos estan dentro
+	
+	if (cuts[2] == 5){return -1;}	//caja fuera de los planos de cámara
+	else if (cuts[0] == 5){return 1;}	//caja dentro de los planos de cámara
+	//printf("cut \n");
 	return 0; // BBox CUTS the camera's, but isn't fully inside
 }
 
