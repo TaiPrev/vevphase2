@@ -473,7 +473,7 @@ void Node::updateCull(Camera * cam,
 //          update m_isCulled accordingly.
 
 void Node::frustumCull(Camera *cam) {
-	int cut = cam->checkFrustum(m_containerWC);
+	int cut = cam->checkFrustum(m_containerWC, 0);
 	//like this we obtain the frustum check with the Camera-> -1 = isn't in; 0 = cuts with the camera's frustum; 1 = inside the camera's frustum
 	if (cut == -1){
 		this->setCulled(true);	//true, the item IS culled, hence out of the camera's view
@@ -484,8 +484,8 @@ void Node::frustumCull(Camera *cam) {
 	else if (cut == 0){
 		for(list<Node *>::const_iterator it = m_children.begin(), end = m_children.end(); it != end; ++it) {
 			//ITERAMOS por los hijos
-			const Node *theChild = *it;
-			theChild->frustumCull(*cam);
+			Node *theChild = *it;
+			theChild->frustumCull(cam);
 		}
 	}
 }
