@@ -25,7 +25,7 @@ bool Avatar::walkOrFly(bool walkOrFly) {
 bool Avatar::advance(float step) {
 	bool res = true;
 	Node *rootNode = Scene::instance()->rootNode(); // root node of scene
-	Vector3 original_pos = m_bsph->getPosition();		//se copia la posición original del vector de posición
+	Vector3 original_pos = m_bsph->getPosition();	//se copia la posición original del vector de posición
 	Vector3 P = m_cam->getPosition();				//vector sobre el que se opera
 	Vector3 dir = -1.0 * m_cam->getDirection();		//dirección de la cámara
 	if(m_walk){P[0]+= step * dir[0]; P[2]+= step * dir[2];}		
@@ -37,18 +37,18 @@ bool Avatar::advance(float step) {
 	//aparte de esto, creo que si la esfera esta envuelta por el BBox de la escena
 	//pero no corta en ninguna parte no devuelve que haya una interseccion
 
-	if(rootNode->checkCollision(m_bsph) !=0){	//si hay colisión...
-		res = false;
-		printf("HAY COLISION \n");
-		m_bsph->setPosition(original_pos);
-	}
-	else{
-		printf("NO HAY COLISION \n");
+	if(rootNode->checkCollision(m_bsph) == 0){	//si NO hay colisión...
+		//printf("NO HAY COLISION \n");
 		if(m_walk){m_cam->walk(step);}
 		else{m_cam->fly(step);}
-		m_bsph->setPosition(m_cam->getPosition());	//se reajusta la posición
+		m_bsph->setPosition(m_cam->getPosition());	//se pone la posición original
 	}
-	printf("%s\n", res?"true":"false");
+	else{
+		res = false;
+		//printf("HAY COLISION \n");
+		m_bsph->setPosition(original_pos);
+	}
+	//printf("%s\n", res?"true":"false");
 	return res;
 }
 
