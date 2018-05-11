@@ -501,17 +501,23 @@ void Node::frustumCull(Camera *cam) {
 //    method.
 
 const Node *Node::checkCollision(const BSphere *bsph) const {
-	//check for the father, the current one, before entering the for
-	if (BSphereBBoxIntersect(bsph,m_containerWC) && not m_gObject!=0){
-
-		for(list<Node *>::const_iterator it = m_children.begin(), end = m_children.end();
-        	it != end; ++it) {
-        	const Node *theChild = *it;
-        	if(BSphereBBoxIntersect(bsph,theChild->m_containerWC)){	//si hay colisión
-        		if(theChild->m_gObject!=0){printf("found \n"); return theChild;}	//si es hijo Objeto devuelve este
-        		else{printf("deeper \n"); theChild->checkCollision(bsph);}	//si no lo es busca en los hijos de este
-        	}
-   	 	}
+	int parent_collision = BSphereBBoxIntersect(bsph,m_containerWC);
+	//printf("Parent collision %d \n", parent_collision);
+	if(parent_collision == 0){	//bsph INTERSECTS with the parent
+		if (m_gObject==0){	//node ISN'T an OBJECT
+			//printf(" NOT AN OBJECT \n");
+			for(list<Node *>::const_iterator it = m_children.begin(), end = m_children.end();
+        		it != end; ++it) {
+        		const Node *theChild = *it;
+        		if (theChild->checkCollision(bsph) != 0){	//SI checkcollision ha encontrado una colisión en un hijo
+        			return theChild;	//devolverla
+        		}
+   	 		}
+   	 		return 0;	//pasamos por todos los hijos pero ninguno ha devuelto un nodo, por tanto no hay colisión
+		}
+		else{	//node IS an OBJECT and INTERSECTS with bsph
+			return this;
+		}
 	}
 	//if (m_checkCollision) return 0;
 	return 0; /* No collision */
