@@ -32,11 +32,6 @@ bool Avatar::advance(float step) {
 	else{P+= step * dir;}
 	m_bsph->setPosition(P);
 
-	//NOTAS DE POR QUE NO FUNCIONA CORRECTAMENTE:
-	//la condición del if no parece ser correcta, siempre pasa por el else
-	//aparte de esto, creo que si la esfera esta envuelta por el BBox de la escena
-	//pero no corta en ninguna parte no devuelve que haya una interseccion
-
 	if(rootNode->checkCollision(m_bsph) == 0){	//si NO hay colisión...
 		//printf("NO HAY COLISION \n");
 		if(m_walk){m_cam->walk(step);}
