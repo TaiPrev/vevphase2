@@ -36,9 +36,20 @@ uniform struct light_t {
 } theLights[4];     // MG_MAX_LIGHTS
 
 void main() {
-	vec3 L;
+	vec3 L[4];	//the 4 lights
+	mat4 cameraToTangentMatrix;
+	vec4 N; vec4 T; vec4 B; vec4 V;	//Normal, Tanget, Bitangent and V vector for SCCamera
 
-	mat3 MV3x3 = mat3(modelToCameraMatrix); // 3x3 modelview matrix
+	vec4 P4 = modelToCameraMatrix * vec4(v_position, 1.0);	//positionEye
+
+	N = modelToCameraMatrix * vec4(v_normal, 0.0);
+	T = modelToCameraMatrix * vec4(v_TBN_t, 0.0);
+	B = modelToCameraMatrix * vec4(v_TBN_b, 0.0);
+	V = (0.0, 0.0, 0.0, 1.0) - P4;					//V
+
+
+
+	//mat3 MV3x3 = mat3(modelToCameraMatrix); // 3x3 modelview matrix
 
 	gl_Position = modelToClipMatrix * vec4(v_position, 1.0);
 }
