@@ -10,6 +10,12 @@ http://www.opengl-tutorial.org/es/intermediate-tutorials/tutorial-13-normal-mapp
 
 http://www.ozone3d.net/tutorials/vertex_displacement_mapping_p03.php
 
+mat4(
+  vec4,           // first column
+  vec4,           // second column
+  vec4,           // third column
+  vec4);          // fourth column
+
 ////////////////////////////////////////////////////////////////
 
 http://image.diku.dk/projects/media/morten.mikkelsen.08.pdf
