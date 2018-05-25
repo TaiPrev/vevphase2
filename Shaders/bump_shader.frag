@@ -30,7 +30,6 @@ varying vec2 f_texCoord;
 varying vec3 f_viewDirection;     // tangent space
 varying vec3 f_lightDirection[4]; // tangent space
 varying vec3 f_spotDirection[4];  // tangent space
-varying vec3 f_normal;	//normal pasada al espacio de la tangente, añadido por mi
 
 
 //NOTES: DON'T USE POSITION
@@ -82,22 +81,22 @@ void point_light(const in int i,
 // Note: no attenuation in spotlights
 
 void spot_light(const in int i,
-				//const in vec3 lightDirection,
-				const in vec3 spotDir,
+				const in vec3 L,
+				const in vec3 spotDirection,
 				const in vec3 viewDirection,
 				const in vec3 normal,
 				inout vec3 diffuse, inout vec3 specular) {
-
 				//vec3 l = vec3(0.0);
 				//l = normalize(theLights[i].position.xyz - position);
+				float SoL = max(dot(spotDirection, -L), 0.0);
 
-				float cSpot = dot(-spotDir, theLights[i].spotDir);
+				float cSpot = dot(-spotDirection, theLights[i].spotDir);
 				if(cSpot > theLights[i].cosCutOff){
 					cSpot = pow(cSpot, theLights[i].exponent);
-					float NoL = lambert(normal, spotDir);
+					float NoL = lambert(normal, L);
 					if(NoL>0.0){
 						diffuse = diffuse + NoL * theLights[i].diffuse * theMaterial.diffuse * cSpot;
-						vec3 r = 2 * NoL * normal - spotDir;
+						vec3 r = 2 * NoL * normal - L;
 						float aux = pow(dot(r, viewDirection), theMaterial.shininess);
 						specular = specular + NoL * max(0.0, aux) * theMaterial.specular * theLights[i].specular * cSpot;
 					}
@@ -110,35 +109,30 @@ void main() {
 	//acumuladores
 	vec3 diffuse = vec3(0.0);
 	vec3 specular = vec3(0.0);
-	/*
-varying vec2 f_texCoord;
-varying vec3 f_viewDirection;     // tangent space
-varying vec3 f_lightDirection[4]; // tangent space
-varying vec3 f_spotDirection[4];  // tangent space
-*/
 
 	//NORMALIZACIONES DE LOS VARYING
 	vec3 V = normalize(f_viewDirection);
-	vec3 N = normalize(f_normal);
+	vec3 N = texture2D(bumpmap, f_texCoord).rgb * 2.0 - 1.0;
 
 	//QUITAR EL FOR Y PASAR POR LAS 4 LUCES A MANO
 
 	for(int i=0; i < active_lights_n; ++i) {
 		if(theLights[i].position.w == 0.0) {
 		  // direction light
-		  vec3 L = normalize(f_lightDirection[i]);
+		  vec3 L = f_lightDirection[i];
 		  direction_light(i, L, V, N, diffuse, specular);
 		} 
 		  else {
 		  if (theLights[i].cosCutOff == 0.0) {
 			// point light
-			vec3 L = normalize(f_lightDirection[i]);
+			vec3 L = f_lightDirection[i];
 			point_light(i, L, V, N, diffuse, specular);
 		  } 
 		  else {
 			// spot light
 			vec3 spotDir = normalize(f_spotDirection[i]);
-			spot_light(i, spotDir, V, N, diffuse, specular);
+			vec3 L = f_lightDirection[i];
+			spot_light(i, L, spotDir, V, N, diffuse, specular);
 		  }
 		}
 	 }
