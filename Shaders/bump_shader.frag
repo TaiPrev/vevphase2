@@ -88,9 +88,9 @@ void spot_light(const in int i,
 				inout vec3 diffuse, inout vec3 specular) {
 				//vec3 l = vec3(0.0);
 				//l = normalize(theLights[i].position.xyz - position);
-				float SoL = max(dot(spotDirection, -L), 0.0);
+				//float SoL = max(dot(spotDirection, -L), 0.0);
 
-				float cSpot = dot(-spotDirection, theLights[i].spotDir);
+				float cSpot = max(dot(-L, spotDirection), 0.0);
 				if(cSpot > theLights[i].cosCutOff){
 					cSpot = pow(cSpot, theLights[i].exponent);
 					float NoL = lambert(normal, L);
@@ -119,19 +119,19 @@ void main() {
 	for(int i=0; i < active_lights_n; ++i) {
 		if(theLights[i].position.w == 0.0) {
 		  // direction light
-		  vec3 L = f_lightDirection[i];
+		  vec3 L = normalize(f_lightDirection[i]);
 		  direction_light(i, L, V, N, diffuse, specular);
 		} 
 		  else {
 		  if (theLights[i].cosCutOff == 0.0) {
 			// point light
-			vec3 L = f_lightDirection[i];
+			vec3 L = normalize(f_lightDirection[i]);
 			point_light(i, L, V, N, diffuse, specular);
 		  } 
 		  else {
 			// spot light
 			vec3 spotDir = normalize(f_spotDirection[i]);
-			vec3 L = f_lightDirection[i];
+			vec3 L = normalize(f_lightDirection[i]);
 			spot_light(i, L, spotDir, V, N, diffuse, specular);
 		  }
 		}
