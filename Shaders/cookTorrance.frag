@@ -79,9 +79,7 @@ void direction_light(const in int i,
 			float G = termino_geometrico(lightDirection, viewDirection, H, normal);
 			float D = beckman(H, normal); 
 			float NoV = lambert(normal, viewDirection);
-			//float aux = pow(dot(r, viewDirection), theMaterial.shininess);
-			//CALCULO DE REFLEXIÓN ESPECULAR
-			specular = specular + NoL * max(0.0, aux) * theMaterial.specular * theLights[i].specular;
+
 		}
 		
 }
