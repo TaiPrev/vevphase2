@@ -10,7 +10,6 @@ varying vec2 f_texCoord;
 varying vec3 f_viewDirection;     // tangent space
 varying vec3 f_lightDirection[4]; // tangent space
 varying vec3 f_spotDirection[4];  // tangent space
-varying vec3 f_normal;	//normal pasada al espacio de la tangente, añadido por mi
 
 // all attributes in model space
 attribute vec3 v_position;
@@ -55,8 +54,6 @@ void main() {
 	//pasar V y positionEye al espacio tangente
 	vec4 V4 = cameraToTangentMatrix * V;
 	f_viewDirection = V4.xyz;
-	vec4 N4 = cameraToTangentMatrix * N;
-	f_normal = N4.xyz;
 	for (int i = 0; i<4; i++){
 		if(theLights[i].position.w == 0.0) {
 		  // direction light   vec3 L = normalize(-theLights[i].position.xyz);
