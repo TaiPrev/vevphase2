@@ -44,7 +44,7 @@ float lambert(const vec3 n, const vec3 l) {
 //aproximación de Schlick
  float fresnel (const vec3 L,
 					 const vec3 H){
-	return lambda + (1-lambda)*pow( (1-dot(L, H)) ,5.0)
+	return lambda + (1-lambda)*pow( (1-dot(L, H)) ,5.0);
 }
 
  float termino_geometrico (const vec3 L,
@@ -71,14 +71,18 @@ void direction_light(const in int i,
 					 inout vec3 diffuse, inout vec3 specular) {
 		float NoL = lambert(normal, lightDirection);
 		if (NoL>0.0){
-			vec3 aux_dif = NoL * theMaterial.diffuse * theLights[i].diffuse;		//nuestro albedo
-			diffuse = diffuse + aux_dif/pi;
+			//vec3 aux_dif = NoL * theMaterial.diffuse * theLights[i].diffuse;		//nuestro albedo
+			diffuse = diffuse + theMaterial.diffuse/pi;
 			//specular = F(L, H)*G(L,V,H)*D(H) / 4*(N*L)*(N*V)
 			vec3 H = normalize(lightDirection+viewDirection);
 			float F = fresnel(lightDirection, H);
 			float G = termino_geometrico(lightDirection, viewDirection, H, normal);
 			float D = beckman(H, normal); 
 			float NoV = lambert(normal, viewDirection);
+
+			vec3 aux_spc = vec3(F * G * D);
+			float aux_den = NoV * NoL * 4;
+			specular = specular + (aux_spc/aux_den);
 
 		}
 		
@@ -97,16 +101,21 @@ void point_light(const in int i,
 					 //el vector de dirección de la luz desde su posición hasta la superficie que ilumina
 					 vec3 L = vec3(0.0);
 					 L = normalize(theLights[i].position.xyz - position);
-					 float NoL = lambert(normal, l);
+					 float NoL = lambert(normal, L);
 					 if (NoL > 0.0){
-					 	vec3 aux_dif = NoL * theLights[i].diffuse * theMaterial.diffuse * atenuacion;
-						diffuse = diffuse + aux_dif/pi;
+					 	//vec3 aux_dif = NoL * theLights[i].diffuse * theMaterial.diffuse * atenuacion;
+						//diffuse = diffuse + aux_dif/pi;
+					 	diffuse = diffuse + theMaterial.diffuse/pi;
 
 						vec3 H = normalize(L+viewDirection);
 						float F = fresnel(L, H);
 						float G = termino_geometrico(L, viewDirection, H, normal);
 						float D = beckman(H, normal); 
 						float NoV = lambert(normal, viewDirection);
+
+						vec3 aux_spc = vec3(F * G * D);
+						float aux_den = NoV * NoL * 4;
+						specular = specular + (aux_spc/aux_den);
 					 }
 				 }
 }
@@ -123,18 +132,23 @@ void spot_light(const in int i,
 
 				 if (atenuacion > 0.0){
 					 //el vector de dirección de la luz desde su posición hasta la superficie que ilumina
-					 vec3 l = vec3(0.0);
-					 l = normalize(theLights[i].position.xyz - position);
-					 float NoL = lambert(normal, l);
+					 vec3 L = vec3(0.0);
+					 L = normalize(theLights[i].position.xyz - position);
+					 float NoL = lambert(normal, L);
 					 if (NoL > 0.0){
-					 	vec3 aux_dif = NoL * theLights[i].diffuse * theMaterial.diffuse * atenuacion;
-						diffuse = diffuse + aux_dif/pi;
+					 	//vec3 aux_dif = NoL * theLights[i].diffuse * theMaterial.diffuse * atenuacion;
+						//diffuse = diffuse + aux_dif/pi;
+						diffuse = diffuse + theMaterial.diffuse/pi;
 
 						vec3 H = normalize(L+viewDirection);
 						float F = fresnel(L, H);
 						float G = termino_geometrico(L, viewDirection, H, normal);
 						float D = beckman(H, normal); 
 						float NoV = lambert(normal, viewDirection);
+
+						vec3 aux_spc = vec3(F * G * D);
+						float aux_den = NoV * NoL * 4;
+						specular = specular + (aux_spc/aux_den);
 					 }
 				 }
 }
@@ -169,5 +183,5 @@ void main(){
 	specular = (1 - kd) * specular;
 	vec4 f_color = vec4(diffuse+specular, 1.0);
 	//gl_FragColor = f_color * texture2D(texture0, f_texCoord);	//vec4
-	gl_FragColor = 
+	gl_FragColor = f_color * texture2D(texture0, f_texCoord);	
 }
