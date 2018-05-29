@@ -30,11 +30,11 @@ varying vec2 f_texCoord;
 
 const float pi = 3.14159265358979323846264;
 // r = roughness = rugosidad , rango = [ 0 , 1 ]
-const float roughness = 0.1;
+const float roughness = 0.9;
 // lambda = factor de reflectancia de Fresnel ,
 // rango = [ 0.01 , 0.95 ]
-const float lambda = 0.7;
-const float kd = 0.7;
+const float lambda = 0.9;
+const float kd = 0.2;
 
 
 float lambert(const vec3 n, const vec3 l) {
@@ -64,31 +64,6 @@ float beckman (const vec3 H,
 	return pow(D, exp);
 }
 
-void fdiffuse(const in int i,
-			  const in vec3 L,
-			  const in vec3 V,
-			  inout vec3 diffuse){
-	diffuse = diffuse + theMaterial.diffuse/pi;
-}
-
-void fspecular(const in int i,
-			  const in vec3 L,
-			  const in vec3 V,
-			  const in vec3 N,
-			  inout vec3 specular){
-	float NoL = lambert(N, L);
-	if (NoL>0.0){
-		vec3 H = normalize(L+V);
-		float F = fresnel(L, H);
-		float G = termino_geometrico(L, V, H, N);
-		float D = beckman(H, N); 
-		float NoV = lambert(N, V);
-
-		vec3 aux_spc = vec3(F * G * D);
-		float aux_den = NoV * NoL * 4;
-		specular = specular + aux_spc/aux_den;
-	}
-}
 
 void direction_light(const in int i,
 					 const in vec3 lightDirection,
@@ -159,18 +134,15 @@ void spot_light(const in int i,
 				inout vec4 f_color){
 				//inout vec3 diffuse, inout vec3 specular) {
 
-				 float d = distance(theLights[i].position.xyz, position);
-				 float atenuacion = 1 / (theLights[i].attenuation[0] + theLights[i].attenuation[1] * d +  theLights[i].attenuation[2] * pow(d, 2.0));
+				//el vector de dirección de la luz desde su posición hasta la superficie que ilumina
+				vec3 L = vec3(0.0);
+				L = normalize(theLights[i].position.xyz - position);
 
-				 if (atenuacion > 0.0){
-					 //el vector de dirección de la luz desde su posición hasta la superficie que ilumina
-					 vec3 L = vec3(0.0);
-					 L = normalize(theLights[i].position.xyz - position);
+				float cSpot = dot(-L, theLights[i].spotDir);
+				if(cSpot > theLights[i].cosCutOff){
 					 float NoL = lambert(normal, L);
 					 if (NoL > 0.0){
-					 	//vec3 aux_dif = NoL * theLights[i].diffuse * theMaterial.diffuse * atenuacion;
-						//diffuse = diffuse + aux_dif/pi;
-						vec3 diffuse = theMaterial.diffuse * atenuacion;
+						vec3 diffuse = theMaterial.diffuse * cSpot;
 
 						vec3 H = normalize(L+viewDirection);
 						float F = fresnel(L, H);
@@ -185,47 +157,32 @@ void spot_light(const in int i,
 						vec3 aux_col = vec3(theLights[i].diffuse * NoL * fr);
 						f_color = f_color + vec4(aux_col, 0.0);
 					 }
-				 }
+				}
 }
 
 void main(){
-	//acumuladores
-	vec3 diffuse = vec3(0.0);
-	vec3 specular = vec3(0.0);
+	//acumulador
+	vec4 f_color = vec4(0.0, 0.0, 0.0, 1.0);
 	//NORMALIZACIONES DE LOS VARYING
 	vec3 P = f_position;
 	vec3 V = normalize(f_viewDirection);
 	vec3 N = normalize(f_normal);
-	vec4 f_color = vec4(0.0, 0.0, 0.0, 1.0);
-
 	for(int i=0; i<active_lights_n; i++){
 		if(theLights[i].position.w == 0.0) {
 		  // direction light
 		  vec3 L = normalize(-theLights[i].position.xyz);
 		  direction_light(i, L, V, N, f_color);
-		  //fdiffuse(i, L, V, diffuse);
-		  //fspecular(i, L, V, N, specular);
 		} 
 		  else {
 		  if (theLights[i].cosCutOff == 0.0) {
 			// point light
 			point_light(i, P, V, N, f_color);
-			//vec3 L = normalize(theLights[i].position.xyz - P);
-			//fdiffuse(i, L, V, diffuse);
-			//fspecular(i, L, V, N, specular);
 		  } 
 		  else {
 			// spot light
 			spot_light(i, P, V, N, f_color);
-			//vec3 L = normalize(theLights[i].position.xyz - P);
-			//fdiffuse(i, L, V, diffuse);
-			//fspecular(i, L, V, N, specular);
 		  }
 		}
 	}
-	//diffuse = kd * diffuse;
-	//specular = (1 - kd) * specular;
-	//vec4 f_color = vec4(diffuse+specular, 1.0);
-	//gl_FragColor = f_color * texture2D(texture0, f_texCoord);	//vec4
 	gl_FragColor = f_color * texture2D(texture0, f_texCoord);	
 }
